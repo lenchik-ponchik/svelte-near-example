@@ -2,7 +2,8 @@
 	import { onMount } from 'svelte';
 	import type { AccountBalance } from 'near-api-js/lib/account';
 	import type { Near, WalletConnection } from 'near-api-js';
-	import { formatNearAmount } from 'near-api-js/lib/utils/format';
+	import { formatNearAmount, parseNearAmount } from 'near-api-js/lib/utils/format';
+	import BN from 'bn.js';
 
 	const nearAPI = window['nearApi'];
 
@@ -43,16 +44,16 @@
 	}
 	async function functionCallExample() {
 		await wallet.account().functionCall({
-			contractId: '',
-			methodName: '',
-			args: {}
-			// gas?: BN,
-			// attachedDeposit?: BN,
+			contractId: 'freespin.testnet',
+			methodName: 'nft_mint',
+			args: {},
+			gas: new BN(300000000000000),
+			attachedDeposit: new BN(parseNearAmount('.779'))
 		});
 	}
 </script>
 
-<h1>Welcome to SPIN</h1>
+<h1>Welcome to SPIN NFT Testing</h1>
 <h2>Auth</h2>
 {#if !signedIn}
 	<button on:click={() => signIn()}>Sign in to SPIN</button>
@@ -62,11 +63,13 @@
 {/if}
 <button on:click={() => signOut()}>Sign out</button>
 
-<h2>Example:</h2>
-<button on:click={async () => await functionCallExample()}>Example Function Call</button>
+{#if signedIn}
+	<h2>NFT Minting:</h2>
+	<button on:click={async () => await functionCallExample()}>Mint NFT</button>
+{/if}
 
-<h2>Balances</h2>
 {#if balances}
+	<h2>Balances</h2>
 	<p>Total: {formatNearAmount(balances.total)} NEAR</p>
 	<p>Staked: {formatNearAmount(balances.staked)} NEAR</p>
 	<p>Available: {formatNearAmount(balances.available)} NEAR</p>
